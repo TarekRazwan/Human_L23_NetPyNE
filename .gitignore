@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# NEURON compiled files
+mod/x86_64/
+mod/*.o
+mod/*.c
+
+# Large output data files
+output/*.json
+output/*.pkl
+output/*.h5
+output/*.hdf5
+
+# OS
+.DS_Store

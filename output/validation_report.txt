@@ -1,0 +1,25 @@
+=== Yao 2022 Healthy Model Validation Report ===
+Date: 2026-03-01 11:08
+Seeds evaluated (healthy): [1234]
+Seeds evaluated (SST-silenced): []
+
+FIRING RATES (mean ± SD, non-silent >0.2 Hz, t>2000ms):
+Population   | Our value      | Paper target   | % error 
+----------------------------------------------------------
+PYR          | 0.80 ± 0.00 Hz     | 1.20 ± 0.20 Hz    | -33.7%
+SST          | 10.18 ± 0.00 Hz     | 5.62 ± 0.27 Hz    | +81.2%
+PV           | 2.78 ± 0.00 Hz     | 10.19 ± 0.51 Hz    | -72.7%
+VIP          | 3.20 ± 0.00 Hz     | 3.52 ± 0.37 Hz    | -9.1%
+
+PER-SEED RATES:
+Seed    PYR       SST       PV        VIP     
+  1234  0.80 Hz  10.18 Hz  2.78 Hz  3.20 Hz
+
+SST silencing: insufficient shared seeds (0) — need ≥2.
+
+GENERATED PLOTS:
+  fig2C_raster.png  (110 KB)
+  fig2D_baseline_rates.png  (78 KB)
+  fig2E_SST_silencing.png  — NOT GENERATED
+  fig2F_voltage_traces.png  (75 KB)
+  fig2G_spike_PSD.png  (311 KB)

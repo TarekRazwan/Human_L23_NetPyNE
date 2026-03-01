@@ -1,0 +1,253 @@
+// =============================================================================
+// HL23PYR_Cell.hoc
+// Standalone NetPyNE cell template: HL23PYR morphology + biophysics combined.
+// Used by netParams.importCellParams — takes no arguments (SWC path hardcoded).
+// Axon policy: delete_axon(3,1.75,1,1) — simplified tapered axon + myelin.
+// =============================================================================
+
+{load_file("import3d.hoc")}
+
+begintemplate HL23PYR_Cell
+
+public init, delete_axon, delete_axon_BPO, geom_nseg
+public locateSites, getLongestBranch, distribute_channels, connect2target
+public initRand, cell_name, rd1, pA
+public all, apical, basal, somatic, axonal
+public nSecAll, nSecSoma, nSecApical, nSecBasal
+public soma, dend, apic, axon, myelin
+public synlist, OUprocess, rslist, roulist, siteVec
+
+objref all, somatic, apical, axonal, basal
+objref synlist, rList, rd1, sref, this, sf, OUprocess, rslist, roulist
+strdef tstr, cell_name
+double siteVec[2]
+
+create soma[1], dend[1], apic[1], axon[1], myelin[1]
+
+proc init() { local _la, _lb   localobj nl, imprt
+    all     = new SectionList()
+    somatic = new SectionList()
+    basal   = new SectionList()
+    apical  = new SectionList()
+    axonal  = new SectionList()
+    forall delete_section()
+
+    cell_name = "HL23PYR"
+    synlist   = new List()
+    OUprocess = new List()
+    rslist    = new List()
+    roulist   = new List()
+
+    nl = new Import3d_SWC_read()
+    nl.quiet = 1
+    nl.input("morphologies/HL23PYR.swc")
+    imprt = new Import3d_GUI(nl, 0)
+    imprt.instantiate(this)
+
+    geom_nseg()
+    delete_axon(3, 1.75, 1, 1)
+
+    initRand(1005)
+    forsec this.all {
+        if (diam == 0) { diam = 1 }
+    }
+
+    _la = 0   _lb = 0
+    forsec "apic" { _la = _la + L }
+    forsec "dend" { _lb = _lb + L }
+    if ((_la + _lb) > 0) { pA = _la / (_la + _lb) } else { pA = 0 }
+
+    biophys()
+}
+
+// ---------------------------------------------------------------------------
+// Geometry helpers (from NeuronTemplate.hoc)
+// ---------------------------------------------------------------------------
+proc geom_nseg() { local nSec
+    soma area(0.5)
+    nSec = 0
+    forsec all { nseg = 1 + 2*int(L/40)   nSec = nSec + 1 }
+    nSecAll = nSec
+    nSec = 0   forsec somatic { nSec = nSec + 1 }   nSecSoma    = nSec
+    nSec = 0   forsec apical  { nSec = nSec + 1 }   nSecApical  = nSec
+    nSec = 0   forsec basal   { nSec = nSec + 1 }   nSecBasal   = nSec
+}
+
+proc delete_axon() {
+    forsec axonal { delete_section() }
+    create axon[2]
+    access axon[0] {
+        L = 20   nseg = 1+2*int(L/10)   diam(0:1) = $1:$2
+        all.append()   axonal.append()
+    }
+    access axon[1] {
+        L = 30   nseg = 1+2*int(L/10)   diam(0:1) = $2:$3
+        all.append()   axonal.append()
+    }
+    if ($4) {
+        create myelin[1]
+        access myelin { L = 1000   diam = $4   nseg = 1+2*int(L/100) }
+        connect myelin(0), axon[1](1)
+    }
+    nSecAxonal = 2
+    connect axon(0), soma(0.5)
+    connect axon[1](0), axon[0](1)
+    access soma
+}
+
+proc delete_axon_BPO() {
+    forsec axonal { delete_section() }
+    create axon[2]
+    access axon[0] { L=30  nseg=1  diam=1  all.append()  axonal.append() }
+    access axon[1] { L=30  nseg=1  diam=1  all.append()  axonal.append() }
+    nSecAxonal = 2
+    connect axon[0](0), soma[0](1)
+    connect axon[1](0), axon[0](1)
+    access soma
+}
+
+func getLongestBranch() { local maxL, d   localobj distallist, sref2
+    sprint(tstr, "%s distance()", $s1)
+    execute(tstr, this)
+    if (0 == strcmp($s1, "axon")) {
+        sprint(tstr, "%s[0] distance(1)", $s1)
+        execute(tstr, this)
+    }
+    maxL = 0   d = 0
+    distallist = new SectionList()
+    forsec $s1 { sref2 = new SectionRef()   if (sref2.nchild == 0) { distallist.append() } }
+    forsec distallist { d = distance(1)   if (maxL < d) { maxL = d } }
+    if (maxL == 0) { $s1 { maxL = L } }
+    return maxL
+}
+
+obfunc locateSites() { local maxL, site, d0, d1, siteX, i   localobj vv, ll
+    ll = new List()
+    sprint(tstr, "%s distance()", $s1)   execute(tstr, this)
+    if (0 == strcmp($s1, "axon")) {
+        sprint(tstr, "%s[0] distance(1)", $s1)   execute(tstr, this)
+    }
+    maxL = getLongestBranch($s1)
+    site = $2   i = 0
+    forsec $s1 {
+        d0 = distance(0)   d1 = distance(1)
+        if (d0 > d1) { d0 = distance(1)   d1 = distance(0) }
+        if (site <= d1 && site >= d0) {
+            siteX = (site - d0) / (d1 - d0)
+            vv = new Vector()
+            ll.append(vv.append(i, siteX))
+        }
+        i = i + 1
+    }
+    return ll
+}
+
+proc distribute_channels() { local dist, val, maxLength
+    soma distance()
+    maxLength = getLongestBranch($s1)
+    forsec $s1 {
+        if (0 == strcmp($s2, "Ra")) {
+            Ra = $8
+        } else {
+            for (x) {
+                if ($3==3 || $3==4 || $3==5) { dist = distance(x) } else { dist = distance(x)/maxLength }
+                val = calculate_distribution($3, dist, $4, $5, $6, $7, $8)
+                sprint(tstr, "%s(%-5.10f) = %-5.10f", $s2, x, val)
+                execute(tstr)
+            }
+        }
+    }
+}
+
+func calculate_distribution() { local value
+    if ($1==0) { value = $3 + $2*$4 }
+    if ($1==1) { value = $3 + ($4/(1+exp(($2-$5)/$6))) }
+    if ($1==2) { value = $3 + $6*exp($4*($2-$5)) }
+    if ($1==3) { if (($2>$5) && ($2<$6)) { value=$3 } else { value=$4 } }
+    if ($1==4) { value = $3 + $6*exp($4*($2-$5)) }
+    if ($1==5) { value = $3 + ($4/(1+exp(($2-$5)/$6))) }
+    value = value * $7
+    return value
+}
+
+proc initRand() {
+    rList = new List()
+    rd1   = new Random($1)
+    rd1.uniform(0, 1)
+}
+
+proc connect2target() {
+    soma $o2 = new NetCon(&v(1), $o1)
+    $o2.threshold = -30
+}
+
+// ---------------------------------------------------------------------------
+// Biophysics (translated from biophys_HL23PYR.hoc, $o1.X → X)
+// ---------------------------------------------------------------------------
+proc biophys() {
+    forsec all {
+        insert pas
+        Ra = 100   cm = 1   e_pas = -80   g_pas = 0.0000954
+        insert Ih
+    }
+    forsec somatic {
+        insert SK
+        insert CaDynamics
+        insert Ca_LVA
+        insert Ca_HVA
+        insert K_T
+        insert K_P
+        insert Kv3_1
+        insert NaTg
+        insert Im
+        ek = -85   ena = 50
+        gamma_CaDynamics = 0.0005
+        vshiftm_NaTg = 13   vshifth_NaTg = 15   slopem_NaTg = 7
+        gbar_Ih = 0.000148
+    }
+    forsec apical { cm = 2 }
+    forsec basal  { cm = 2   gbar_Ih = 0.000000709 }
+
+    distribute_channels("apic","gbar_Ih",2,-0.8696,3.6161,0.0,2.0870,soma.gbar_Ih)
+
+    forsec axonal {
+        insert SK
+        insert Ca_LVA
+        insert Ca_HVA
+        insert K_T
+        insert K_P
+        insert Nap
+        insert Kv3_1
+        insert NaTg
+        insert CaDynamics
+        insert Im
+        ek = -85   ena = 50
+        vshifth_NaTg = 10   slopem_NaTg = 9
+        gamma_CaDynamics = 0.0005
+    }
+
+    distribute_channels("axon","decay_CaDynamics",0,1,0,0,0,226.0)
+    distribute_channels("axon","gbar_SK",         0,1,0,0,0,0.0145)
+    distribute_channels("axon","gbar_Ca_LVA",     0,1,0,0,0,0.0439)
+    distribute_channels("axon","gbar_Ca_HVA",     0,1,0,0,0,0.000306)
+    distribute_channels("axon","gbar_Kv3_1",      0,1,0,0,0,0.941)
+    distribute_channels("axon","gbar_K_T",        0,1,0,0,0,0.0424)
+    distribute_channels("axon","gbar_K_P",        0,1,0,0,0,0.338)
+    distribute_channels("axon","gbar_Nap",        0,1,0,0,0,0.00842)
+    distribute_channels("axon","gbar_NaTg",       0,1,0,0,0,1.38)
+    distribute_channels("axon","gbar_Im",         0,1,0,0,0,0.0)
+
+    distribute_channels("soma","decay_CaDynamics",0,1,0,0,0,20.0)
+    distribute_channels("soma","gbar_Im",         0,1,0,0,0,0.000306)
+    distribute_channels("soma","gbar_Ca_LVA",     0,1,0,0,0,0.00296)
+    distribute_channels("soma","gbar_Ca_HVA",     0,1,0,0,0,0.00155)
+    distribute_channels("soma","gbar_Kv3_1",      0,1,0,0,0,0.0424)
+    distribute_channels("soma","gbar_SK",         0,1,0,0,0,0.000853)
+    distribute_channels("soma","gbar_K_T",        0,1,0,0,0,0.0605)
+    distribute_channels("soma","gbar_K_P",        0,1,0,0,0,0.000208)
+    distribute_channels("soma","gbar_NaTg",       0,1,0,0,0,0.272)
+
+    forsec "myelin" { Ra = 100   cm = 0.02 }
+}
+
+endtemplate HL23PYR_Cell
