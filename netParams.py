@@ -7,9 +7,8 @@ import sys
 import numpy as np
 from netpyne import specs
 
-# Ensure params package is importable regardless of working directory
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cfg import cfg
+
 from params.circuit_params import (
     CELL_NAMES, CONN_PROBS, SYN_COND, N_CONT, DEPRESSION,
     FACILITATION, USE_PROB, SYN_POS, SING_CELL_PARAM

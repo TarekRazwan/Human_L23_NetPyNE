@@ -1,116 +1,38 @@
-#!/usr/bin/env python3
-# =============================================================================
-# init.py  —  Entry point for L23Net NetPyNE Replica (Yao et al. 2022)
-#
-# Usage:
-#   python init.py [SEED] [--silence-sst]
-#
-# Examples:
-#   python init.py 1234               # healthy, seed 1234
-#   python init.py 1234 --silence-sst # SST-silenced, seed 1234
-#   python init.py                    # healthy, default seed 1234
-#
-# MOD files must be compiled before running:
-#   cd mod && nrnivmodl && cd ..
-# =============================================================================
-import os
-import sys
-import numpy as np
+"""
+init.py  ## see https://github.com/suny-downstate-medical-center/thalamus_netpyne/blob/main/sim/init.py for OU noise implementation 
 
-# ---------------------------------------------------------------------------
-# 0.  Compile MOD files if needed
-# ---------------------------------------------------------------------------
-_mod_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mod')
-_special = os.path.join(_mod_dir, 'x86_64', 'special')
+Starting script to run NetPyNE-based 
 
-if not os.path.isfile(_special):
-    print('[init] Compiling MOD files ...')
-    ret = os.system(f'cd "{_mod_dir}" && nrnivmodl')
-    if ret != 0:
-        raise RuntimeError('nrnivmodl failed — check mod/ directory')
-    print('[init] Compilation done.')
-else:
-    print('[init] MOD files already compiled.')
+Usage:
+    python init.py # Run simulation, optionally plot a raster
 
-# ---------------------------------------------------------------------------
-# 1.  NetPyNE / NEURON imports (AFTER mod compilation)
-# ---------------------------------------------------------------------------
-import neuron
+MPI usage:
+    mpiexec -n 8 nrniv -python -mpi init.py
+
+"""
+
+# import matplotlib; matplotlib.use('agg')  # to avoid graphics error in servers
+
 from netpyne import sim
 from neuron import h
+import numpy as np
 
-# NOTE: MPI via `mpirun` does NOT work on macOS with Open MPI 5 —
-# MPI_Init_thread crashes on the shmem transport (PML add procs, -13).
-# NOTE: NEURON thread parallelism (pc.nthread) cannot be used because
-# Gfluct2 noiseFromRandom() uses non-thread-safe Random objects.
-# Simulation runs single-threaded.
-
-_here = os.path.dirname(os.path.abspath(__file__))
-if _here not in sys.path:
-    sys.path.insert(0, _here)
-
-neuron.load_mechanisms(_mod_dir)
-
-from cfg import cfg
-
-# ---------------------------------------------------------------------------
-# CLI overrides — BEFORE netParams imports cfg at module load.
-#   python init.py [SEED] [--silence-sst] [--full]
-# ---------------------------------------------------------------------------
-import argparse as _ap
-_cli = _ap.ArgumentParser(add_help=False)
-_cli.add_argument('--silence-sst', action='store_true',
-                  help='Zero all SST→* gmax (SST silencing condition)')
-_cli.add_argument('--full', action='store_true',
-                  help='Force full run (testing=False)')
-_args, _ = _cli.parse_known_args()
-
-if _args.silence_sst:
-    cfg.silence_SST = True
-    cfg.simLabel    = f'L23Net_seed{cfg.GLOBALSEED}_SSTsilenced'
-
-if _args.full:
-    cfg.testing       = False
-    cfg.duration      = 4500.0
-    cfg.analysis_tmin = 2000.0
-    cfg.analysis_tmax = cfg.duration
-
-print(f'[init] Seed={cfg.GLOBALSEED}  silence_SST={cfg.silence_SST}  '
-      f'duration={cfg.duration} ms  label={cfg.simLabel}')
-
-from netParams import netParams
 from params.circuit_params import CELL_NAMES, SING_CELL_PARAM
 
-# SST silencing: zero all SST→* connection gmax post-import
-if cfg.silence_SST:
-    silenced = []
-    for key in list(netParams.connParams.keys()):
-        if key.startswith('HL23SST'):
-            netParams.connParams[key]['synMechParams']['gmax'] = 0.0
-            silenced.append(key)
-    print(f'[init] SST silenced: zeroed gmax for {len(silenced)} rule(s): '
-          f'{silenced}')
+
+cfg, netParams = sim.readCmdLineArgs(simConfigDefault='cfg.py', netParamsDefault='netParams.py')
+# sim.create(netParams, cfg)
+# sim.createSimulateAnalyze(netParams, cfg)
+
+sim.initialize(
+    simConfig = cfg, 	
+    netParams = netParams)  				# create network object and set cfg and net params
+sim.net.createPops()               			# instantiate network populations
+sim.net.createCells()              			# instantiate network cells based on defined populations
 
 # Also load net_functions.hoc so HOC helpers are available at cell-build time.
-_net_func_hoc = os.path.join(_here, 'net_functions.hoc')
-h.load_file(_net_func_hoc)
+h.load_file('net_functions.hoc')
 
-# ---------------------------------------------------------------------------
-# 2.  Helper: insert Gfluct2 OU noise per cell
-#
-# Mirrors net_functions.hoc::createArtificialSyn() exactly:
-#
-#   Basal:  locateSites("dend", 0.5 * getLongestBranch("dend"))
-#           → one Gfluct2 per dend section whose path-distance range spans
-#             50% of the longest basal branch.
-#           g_e0 = GOU * exp(0.5)  [relpos=0.5, FIXED — matches HOC line 50]
-#
-#   Apical (PYR only): 5 distances (0.1,0.3,0.5,0.7,0.9 × maxL_apic).
-#           At each distance, pick the widest-diameter section spanning that
-#           point.  g_e0 = GOU * exp(relpos)  [relpos varies 0.1→0.9]
-#
-# Inhibitory OU component is zero (g_i0=0, std_i=0) — matches original.
-# ---------------------------------------------------------------------------
 _OU_REFS = []   # keeps HocObjects alive for entire simulation lifetime
 
 
@@ -275,27 +197,10 @@ def insert_tonic_gaba(sim_obj, cfg_obj, sing_cell_param):
 
     print(f'[init] Inserted tonic GABA into {len(sim_obj.net.cells)} cells.')
 
-
-# ---------------------------------------------------------------------------
-# 4.  Create output directory
-# ---------------------------------------------------------------------------
-out_dir = os.path.join(_here, cfg.saveFolder)
-os.makedirs(out_dir, exist_ok=True)
-
 # ---------------------------------------------------------------------------
 # 5.  Build and run simulation
 # ---------------------------------------------------------------------------
-import datetime
-print(f'[init] Start time: {datetime.datetime.now()}')
 
-print('[init] Initializing simulation ...')
-sim.initialize(netParams=netParams, simConfig=cfg)
-
-print('[init] Creating populations ...')
-sim.net.createPops()
-
-print('[init] Creating cells ...')
-sim.net.createCells()
 
 print('[init] Inserting background noise (Gfluct2) ...')
 insert_ou_noise(sim, cfg, SING_CELL_PARAM)
@@ -303,33 +208,14 @@ insert_ou_noise(sim, cfg, SING_CELL_PARAM)
 print('[init] Inserting tonic GABA inhibition ...')
 insert_tonic_gaba(sim, cfg, SING_CELL_PARAM)
 
-print('[init] Creating connections ...')
+# print('[init] Creating connections ...')
 sim.net.connectCells()
 
-print('[init] Adding external stimuli ...')
+# print('[init] Adding external stimuli ...')
 sim.net.addStims()
 
 print('[init] Setting up recording ...')
 sim.setupRecording()
-
-# ---------------------------------------------------------------------------
-# Direct NEURON vector recording (bypasses broken cfg.recordCells in v1.0.6)
-# Records soma Vm from first cell of each population.
-# ---------------------------------------------------------------------------
-_trace_gids = {'V_PYR': 0, 'V_SST': 800, 'V_PV': 850, 'V_VIP': 920}
-_trace_vecs = {}
-_trace_tvec = h.Vector()
-_trace_tvec.record(h._ref_t, cfg.recordStep)
-for _lbl, _gid in _trace_gids.items():
-    _cell_objs = [c for c in sim.net.cells if c.gid == _gid]
-    if _cell_objs:
-        _hobj = _cell_objs[0].secs['soma']['hObj']
-        _v = h.Vector()
-        _v.record(_hobj(0.5)._ref_v, cfg.recordStep)
-        _trace_vecs[_lbl] = _v
-        print(f'[init] Direct recording: {_lbl} from cell GID {_gid}')
-    else:
-        print(f'[init] WARNING: cell GID {_gid} not found for {_lbl}')
 
 print('[init] Running simulation ...')
 sim.runSim()
@@ -340,58 +226,5 @@ sim.gatherData()
 print('[init] Saving data ...')
 sim.saveData()
 
-# ---------------------------------------------------------------------------
-# 6.  Post-sim: save .npy spike file + rates + traces (rank 0 only)
-# ---------------------------------------------------------------------------
-if sim.rank == 0:
-    # --- Build popGids map ---
-    popGids = {name: sim.net.pops[name].cellGids for name in CELL_NAMES}
-    sim.allSimData['popGids'] = popGids
-
-    # --- Spike arrays ---
-    spkt  = np.array(sim.allSimData.get('spkt',  []))
-    spkid = np.array(sim.allSimData.get('spkid', []))
-
-    spike_label = (f'{cfg.GLOBALSEED}_SSTsilenced' if cfg.silence_SST
-                   else str(cfg.GLOBALSEED))
-    spk_file = os.path.join(out_dir, f'spikes_seed{spike_label}.npy')
-    np.save(spk_file, {'spkt': spkt, 'spkid': spkid, 'popGids': popGids,
-                       'duration': cfg.duration, 'transient': cfg.transient,
-                       'silence_SST': cfg.silence_SST,
-                       'GLOBALSEED': cfg.GLOBALSEED})
-    print(f'[init] Spike data saved → {spk_file}  '
-          f'({len(spkt)} spikes)')
-
-    # --- Voltage traces (from direct h.Vector recording) ---
-    if _trace_vecs:
-        trace_dict = {'t': np.array(_trace_tvec.to_python())}
-        for _lbl, _v in _trace_vecs.items():
-            trace_dict[_lbl] = np.array(_v.to_python())
-        trace_file = os.path.join(out_dir, f'traces_seed{spike_label}.npy')
-        np.save(trace_file, trace_dict)
-        print(f'[init] Voltage traces saved → {trace_file}  '
-              f'(keys: {list(trace_dict.keys())})')
-    else:
-        print('[init] No voltage traces recorded (no cells found).')
-
-    # --- Firing rates ---
-    from analysis import compute_firing_rates, plot_raster
-    rates = compute_firing_rates(sim.allSimData, cfg, CELL_NAMES)
-
-    rate_file = os.path.join(out_dir, f'rates_seed{spike_label}.txt')
-    with open(rate_file, 'w') as _f:
-        for pop, hz in rates.items():
-            _f.write(f'{pop}: {hz:.4f} Hz\n')
-
-    print(f'\n--- Mean Firing Rates (seed={cfg.GLOBALSEED}) ---')
-    targets = {'HL23PYR': 1.2, 'HL23SST': 5.6, 'HL23PV': 10.2, 'HL23VIP': 3.5}
-    for name, hz in rates.items():
-        tgt = targets.get(name, 0)
-        pct = (hz - tgt) / tgt * 100 if tgt else 0
-        print(f'  {name:10s}: {hz:.2f} Hz  (target {tgt:.1f} Hz, '
-              f'{pct:+.0f}%)')
-
-    plot_raster(sim.allSimData, cfg, CELL_NAMES, out_dir,
-                seed=spike_label)
-
-print(f'[init] Done.  End time: {datetime.datetime.now()}')
+print('[init] Plotting data ...')
+sim.analysis.plotData()           		# plot spikes, V traces, rasters, etc.
