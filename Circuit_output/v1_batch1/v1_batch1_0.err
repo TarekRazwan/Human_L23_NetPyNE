@@ -1,6 +1,0 @@
-NEURON -- VERSION 8.2.2 HEAD (93d41fafd) 2022-12-15
-Duke, Yale, and the BlueBrain Project -- Copyright 1984-2022
-See http://neuron.yale.edu/neuron/credits
-
-Additional mechanisms from files
- "mod/CaDynamics.mod" "mod/Ca_HVA.mod" "mod/Ca_LVA.mod" "mod/epsp.mod" "mod/Gfluct.mod" "mod/Ih.mod" "mod/Im.mod" "mod/K_P.mod" "mod/K_T.mod" "mod/Kv3_1.mod" "mod/Nap.mod" "mod/NaTg.mod" "mod/NMDA.mod" "mod/ProbAMPANMDA_EMS.mod" "mod/ProbAMPANMDA.mod" "mod/ProbGABAAB_EMS.mod" "mod/ProbUDFsyn.mod" "mod/SK.mod" "mod/tonic.mod"
