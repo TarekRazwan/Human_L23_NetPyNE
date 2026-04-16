@@ -1,0 +1,250 @@
+{
+    "simConfig": {
+        "Change_axon_names": true,
+        "DRUG": false,
+        "GLOBALSEED": 1234,
+        "LOAD_MATRIX_LFPy": false,
+        "ROTATE_Y": true,
+        "addSynMechs": true,
+        "allowConnsWithWeight0": true,
+        "allowSelfConns": false,
+        "allpops": [
+            "HL23PYR",
+            "HL23SST",
+            "HL23PV",
+            "HL23VIP"
+        ],
+        "analysis": {
+            "plot2Dnet": {
+                "figSize": [
+                    15,
+                    15
+                ],
+                "fontSize": 16,
+                "include": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "saveFig": true,
+                "showConns": false,
+                "view": "xy"
+            },
+            "plotConn": {
+                "feature": "numConns",
+                "figSize": [
+                    24,
+                    24
+                ],
+                "fontSize": 18,
+                "graphType": "matrix",
+                "groupBy": "pop",
+                "includePost": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "includePre": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "orderBy": "gid",
+                "saveData": "v1_batch1_matrix_numConn.json",
+                "saveFig": true
+            },
+            "plotRaster": {
+                "dpi": 300,
+                "figSize": [
+                    12,
+                    6
+                ],
+                "fontSize": 4,
+                "include": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "marker": "o",
+                "markerSize": 4,
+                "orderInverse": true,
+                "saveFig": true,
+                "showFig": false,
+                "timeRange": [
+                    1000,
+                    3000.0
+                ]
+            },
+            "plotShape": {
+                "axisLabels": true,
+                "azim": -90,
+                "clim": [
+                    -70,
+                    -40.0
+                ],
+                "cvar": "voltage",
+                "dist": 0.65,
+                "elev": 95,
+                "figSize": [
+                    24,
+                    24
+                ],
+                "includeAxon": false,
+                "includePost": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "includePre": [
+                    "HL23PYR",
+                    "HL23SST",
+                    "HL23PV",
+                    "HL23VIP"
+                ],
+                "saveFig": true,
+                "showElectrodes": false,
+                "showFig": false,
+                "showSyns": false,
+                "synSize": 2,
+                "synStyle": "o"
+            },
+            "plotTraces": {
+                "axis": false,
+                "figSize": [
+                    18,
+                    18
+                ],
+                "include": [
+                    0,
+                    1,
+                    800,
+                    801,
+                    850,
+                    851,
+                    920,
+                    921
+                ],
+                "legend": null,
+                "oneFigPer": "trace",
+                "overlay": false,
+                "saveFig": true,
+                "showFig": false,
+                "subtitles": null,
+                "timeRange": [
+                    1000,
+                    3000.0
+                ]
+            }
+        },
+        "backupCfgFile": null,
+        "cache_efficient": true,
+        "cellNumber": {
+            "HL23PV": 70,
+            "HL23PYR": 800,
+            "HL23SST": 50,
+            "HL23VIP": 80
+        },
+        "cellNumber0": {
+            "HL23PV": 850,
+            "HL23PYR": 0,
+            "HL23SST": 800,
+            "HL23VIP": 920
+        },
+        "checkErrors": false,
+        "compactConnFormat": false,
+        "connRandomSecFromList": true,
+        "coreneuron": false,
+        "createNEURONObj": true,
+        "createPyStruct": true,
+        "cvode_active": false,
+        "cvode_atol": 1e-06,
+        "distributeSynsUniformly": true,
+        "dt": 0.025,
+        "dump_coreneuron_model": false,
+        "duration": 3000.0,
+        "filename": "model_output",
+        "gExc": 0.945,
+        "gatherOnlySimData": false,
+        "gpu": false,
+        "hParams": {
+            "celsius": 34,
+            "v_init": -80
+        },
+        "includeParamsLabel": false,
+        "invertedYCoord": false,
+        "oneSynPerNetcon": true,
+        "printPopAvgRates": true,
+        "printRunTime": 0.5,
+        "printSynsAfterRule": false,
+        "pt3dRelativeToCellLocation": true,
+        "rand123GlobalIndex": null,
+        "random123": false,
+        "recordCells": [
+            0,
+            1,
+            800,
+            801,
+            850,
+            851,
+            920,
+            921
+        ],
+        "recordCellsSpikes": -1,
+        "recordDipole": false,
+        "recordDipolesHNN": false,
+        "recordLFP": [],
+        "recordStep": 0.025,
+        "recordStim": false,
+        "recordTime": true,
+        "recordTraces": {
+            "V_soma": {
+                "loc": 0.5,
+                "sec": "soma_0",
+                "var": "v"
+            }
+        },
+        "saveCSV": false,
+        "saveCellConns": true,
+        "saveCellSecs": true,
+        "saveDat": false,
+        "saveDataInclude": [
+            "simData",
+            "simConfig",
+            "netParams",
+            "netParams"
+        ],
+        "saveDipoleCells": false,
+        "saveDipolePops": false,
+        "saveDpk": false,
+        "saveFolder": "../data/v1_batch3",
+        "saveHDF5": false,
+        "saveJson": false,
+        "saveLFPCells": false,
+        "saveLFPPops": false,
+        "saveMat": false,
+        "savePickle": true,
+        "saveTiming": false,
+        "scale": 1.0,
+        "seeds": {
+            "cell": 1234,
+            "conn": 1234,
+            "loc": 1234,
+            "stim": 1234
+        },
+        "simLabel": "v1_batch3_0",
+        "sizeX": 500.0,
+        "sizeY": 3300.0,
+        "sizeZ": 500.0,
+        "timestampFilename": false,
+        "timing": true,
+        "tstop": 1000.0,
+        "use_fast_imem": false,
+        "validateNetParams": false,
+        "verbose": false
+    }
+}

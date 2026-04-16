@@ -1,0 +1,86 @@
+NEURON -- VERSION 8.2.2 HEAD (93d41fafd) 2022-12-15
+Duke, Yale, and the BlueBrain Project -- Copyright 1984-2022
+See http://neuron.yale.edu/neuron/credits
+
+Additional mechanisms from files
+ "mod/CaDynamics.mod" "mod/Ca_HVA.mod" "mod/Ca_LVA.mod" "mod/epsp.mod" "mod/Gfluct.mod" "mod/Ih.mod" "mod/Im.mod" "mod/K_P.mod" "mod/K_T.mod" "mod/Kv3_1.mod" "mod/Nap.mod" "mod/NaTg.mod" "mod/NMDA.mod" "mod/ProbAMPANMDA.mod" "mod/ProbUDFsyn.mod" "mod/SK.mod" "mod/tonic.mod"
+4 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+4  near line 0
+4  nao0_na_ion = 140.0
+                    ^
+11 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+11  near line 0
+11  nao0_na_ion = 140.0
+                    ^
+13 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+13  near line 0
+13  nao0_na_ion = 140.0
+                    ^
+17 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+17  near line 0
+17  nao0_na_ion = 140.0
+                    ^
+19 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+19  near line 0
+19  nao0_na_ion = 140.0
+                    ^
+0 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+0  near line 0
+0  nao0_na_ion = 140.0
+                    ^
+2 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+2  near line 0
+2  nao0_na_ion = 140.0
+                    ^
+3 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+3  near line 0
+3  nao0_na_ion = 140.0
+                    ^
+5 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+5  near line 0
+5  nao0_na_ion = 140.0
+                    ^
+6 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+6  near line 0
+6  nao0_na_ion = 140.0
+                    ^
+7 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+7  near line 0
+7  nao0_na_ion = 140.0
+                    ^
+8 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+8  near line 0
+8  nao0_na_ion = 140.0
+                    ^
+9 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+9  near line 0
+9  nao0_na_ion = 140.0
+                    ^
+15 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+15  near line 0
+15  nao0_na_ion = 140.0
+                    ^
+1 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+1  near line 0
+1  nao0_na_ion = 140.0
+                    ^
+16 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+16  near line 0
+16  nao0_na_ion = 140.0
+                    ^
+14 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+14  near line 0
+14  nao0_na_ion = 140.0
+                    ^
+18 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+18  near line 0
+18  nao0_na_ion = 140.0
+                    ^
+10 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+10  near line 0
+10  nao0_na_ion = 140.0
+                    ^
+12 /home/fernando/anaconda3/envs/p38/bin/nrniv: Couldn't find: net_functions.hoc
+12  near line 0
+12  nao0_na_ion = 140.0
+                    ^

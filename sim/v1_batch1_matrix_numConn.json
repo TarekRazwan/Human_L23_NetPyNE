@@ -1,0 +1,45 @@
+{
+    "connMatrix": [
+        [
+            288210.0,
+            61304.0,
+            40448.0,
+            22848.0
+        ],
+        [
+            90132.0,
+            1212.0,
+            9529.0,
+            1175.0
+        ],
+        [
+            89522.0,
+            2992.0,
+            26970.0,
+            1190.0
+        ],
+        [
+            0.0,
+            12546.0,
+            6226.0,
+            2247.0
+        ]
+    ],
+    "feature": "numConns",
+    "groupBy": "pop",
+    "includePost": [
+        "HL23PYR",
+        "HL23SST",
+        "HL23PV",
+        "HL23VIP"
+    ],
+    "includePre": [
+        "HL23PYR",
+        "HL23SST",
+        "HL23PV",
+        "HL23VIP"
+    ],
+    "saveData": "v1_batch1_matrix_numConn.json",
+    "saveFig": true,
+    "showFig": true
+}

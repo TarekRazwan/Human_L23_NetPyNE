@@ -16,13 +16,32 @@ MPI usage:
 from netpyne import sim
 from neuron import h
 import numpy as np
+from mpi4py import MPI
+from scipy import stats as st
+
 
 from params.circuit_params import CELL_NAMES, SING_CELL_PARAM
 
 
-cfg, netParams = sim.readCmdLineArgs(simConfigDefault='cfg.py', netParamsDefault='netParams.py')
+# cfg, netParams = sim.readCmdLineArgs(simConfigDefault='cfg.py', netParamsDefault='netParams.py')
+cfg, netParams = sim.readCmdLineArgs()
 # sim.create(netParams, cfg)
 # sim.createSimulateAnalyze(netParams, cfg)
+
+#MPI variables:
+COMM = MPI.COMM_WORLD
+SIZE = COMM.Get_size()
+RANK = COMM.Get_rank()
+GLOBALSEED = int(cfg.GLOBALSEED)
+
+# Create new RandomState for each RANK
+SEED = GLOBALSEED*10000
+np.random.seed(SEED + RANK)
+local_state = np.random.RandomState(SEED + RANK)
+halfnorm_rv = st.halfnorm
+halfnorm_rv.random_state = local_state
+uniform_rv = st.uniform
+uniform_rv.random_state = local_state
 
 sim.initialize(
     simConfig = cfg, 	
@@ -31,7 +50,7 @@ sim.net.createPops()               			# instantiate network populations
 sim.net.createCells()              			# instantiate network cells based on defined populations
 
 for metype in sim.net.cells:
-    print('cell ->', metype.tags['cellType'], metype.tags['cellModel'], metype.tags['pop'])
+    # print('cell ->', metype.tags['cellType'], metype.tags['cellModel'], metype.tags['pop'])
     if metype.tags['cellType'] == 'HL23PYR':
         metype.secs['axon_0']['hObj'](0.1).diam = 2.875
         metype.secs['axon_0']['hObj'](0.3).diam = 2.625
@@ -113,7 +132,7 @@ def _locate_sites(hobjs, site):
 
 def insert_ou_noise(sim_obj, cfg_obj, sing_cell_param):
     """Insert Ornstein-Uhlenbeck background noise into each cell."""
-    np.random.seed(12340000)
+    # np.random.seed(12340000)
     n_total      = 0
     type_basal   = {}   # {cell_type: total basal Gfluct2}
     type_apical  = {}   # {cell_type: total apical Gfluct2}
@@ -122,8 +141,9 @@ def insert_ou_noise(sim_obj, cfg_obj, sing_cell_param):
     for cell in sim_obj.net.cells:
         cell_type = cell.tags.get('cellType', '')
         gou       = sing_cell_param[cell_type]['GOU']
-        base_seed = cfg_obj.GLOBALSEED * (cell.gid + 1)
-        # base_seed = 7313766 + cell.gid # compare with LFPy
+        rseed = int(local_state.uniform()*SEED)
+        base_seed = rseed # * (cell.gid + 1)
+        # base_seed = 7313766 * int(cfg_obj.GLOBALSEED/1234) * (cell.gid + 1) # compare with LFPy
         idx       = 0
         n_basal   = 0
         n_apical  = 0
@@ -152,7 +172,8 @@ def insert_ou_noise(sim_obj, cfg_obj, sing_cell_param):
             max_L = _get_longest_branch(dend_hobjs)
             ii = 0
             for hobj, x in _locate_sites(dend_hobjs, 0.5 * max_L):
-                _place_ou(hobj, x, 0.5, ii+5)   # relpos_for_g = 0.5 FIXED
+                if cell.gid >= 0: # compare with LFPy
+                    _place_ou(hobj, x, 0.5, ii+5)   # relpos_for_g = 0.5 FIXED
                 idx += 1
                 n_basal += 1
                 ii += 1
@@ -172,7 +193,8 @@ def insert_ou_noise(sim_obj, cfg_obj, sing_cell_param):
                     if not hits:
                         hits = [(apic_hobjs[0], min(relpos, 0.9))]
                     best_hobj, best_x = max(hits, key=lambda t: t[0](t[1]).diam)
-                    _place_ou(best_hobj, best_x, relpos, ii)
+                    if cell.gid >= 0: # compare with LFPy
+                        _place_ou(best_hobj, best_x, relpos, ii)
                     idx += 1
                     n_apical += 1
 
@@ -181,15 +203,15 @@ def insert_ou_noise(sim_obj, cfg_obj, sing_cell_param):
         type_apical[cell_type]  = type_apical.get(cell_type, 0)  + n_apical
         type_n_cells[cell_type] = type_n_cells.get(cell_type, 0) + 1
 
-    print(f'[init] Inserted OU noise into {len(sim_obj.net.cells)} cells '
-          f'({n_total} Gfluct2 total):')
+    # print(f'[init] Inserted OU noise into {len(sim_obj.net.cells)} cells '
+    #       f'({n_total} Gfluct2 total):')
     for _ct in sorted(type_basal):
         _nc = type_n_cells[_ct]
         _nb = type_basal[_ct]   // _nc
         _na = type_apical.get(_ct, 0) // _nc
         _g_basal = sing_cell_param[_ct]['GOU'] * np.exp(0.5) * 1e6
-        print(f'  [OU] {_ct}: {_nb} basal/cell, {_na} apical/cell  '
-              f'(g_e0_basal={_g_basal:.1f} pS = GOU*exp(0.5))')
+        # print(f'  [OU] {_ct}: {_nb} basal/cell, {_na} apical/cell  '
+        #       f'(g_e0_basal={_g_basal:.1f} pS = GOU*exp(0.5))')
 
 
 # ---------------------------------------------------------------------------
@@ -199,67 +221,70 @@ def insert_tonic_gaba(sim_obj, cfg_obj, sing_cell_param):
     """Insert tonic GABA (tonic.mod) into soma/basal of all cells,
     and into apical of PYR cells."""
     for cell in sim_obj.net.cells:
-        cell_type = cell.tags.get('cellType', '')
-        p = sing_cell_param[cell_type]
+        if cell.gid >= 0: # compare with LFPy
+            cell_type = cell.tags.get('cellType', '')
+            p = sing_cell_param[cell_type]
 
-        if cfg_obj.DRUG:
-            g_soma = p['drug_tonic']
-            g_apic = p['drug_apic_tonic']
-        else:
-            g_soma = p['norm_tonic']
-            g_apic = p['apic_tonic']
+            if cfg_obj.DRUG:
+                g_soma = p['drug_tonic']
+                g_apic = p['drug_apic_tonic']
+            else:
+                g_soma = p['norm_tonic']
+                g_apic = p['apic_tonic']
 
-        for sname in [s for s in cell.secs if s.startswith('soma')]:
-            sec = cell.secs[sname]['hObj']
-            sec.insert('tonic')
-            for seg in sec:
-                seg.tonic.g      = g_soma
-                seg.tonic.e_gaba = -75.0
-
-        for sname in [s for s in cell.secs if s.startswith('dend')]:
-            sec = cell.secs[sname]['hObj']
-            sec.insert('tonic')
-            for seg in sec:
-                seg.tonic.g      = g_soma
-                seg.tonic.e_gaba = -75.0
-
-        if 'PYR' in cell_type:
-            for sname in [s for s in cell.secs if s.startswith('apic')]:
+            for sname in [s for s in cell.secs if s.startswith('soma')]:
                 sec = cell.secs[sname]['hObj']
                 sec.insert('tonic')
                 for seg in sec:
-                    seg.tonic.g      = g_apic
+                    seg.tonic.g      = g_soma
                     seg.tonic.e_gaba = -75.0
 
-    print(f'[init] Inserted tonic GABA into {len(sim_obj.net.cells)} cells.')
+            for sname in [s for s in cell.secs if s.startswith('dend')]:
+                sec = cell.secs[sname]['hObj']
+                sec.insert('tonic')
+                for seg in sec:
+                    seg.tonic.g      = g_soma
+                    seg.tonic.e_gaba = -75.0
+
+            if 'PYR' in cell_type:
+                for sname in [s for s in cell.secs if s.startswith('apic')]:
+                    sec = cell.secs[sname]['hObj']
+                    sec.insert('tonic')
+                    for seg in sec:
+                        seg.tonic.g      = g_apic
+                        seg.tonic.e_gaba = -75.0
+
+    # print(f'[init] Inserted tonic GABA into {len(sim_obj.net.cells)} cells.')
 
 # ---------------------------------------------------------------------------
 # 5.  Build and run simulation
 # ---------------------------------------------------------------------------
 
-print('[init] Inserting background noise (Gfluct2) ...')
+# print('[init] Inserting background noise (Gfluct2) ...')
 insert_ou_noise(sim, cfg, SING_CELL_PARAM)
 
-print('[init] Inserting tonic GABA inhibition ...')
+# print('[init] Inserting tonic GABA inhibition ...')
 insert_tonic_gaba(sim, cfg, SING_CELL_PARAM)
 
-print('[init] Creating connections ...')
+sim.cfg.distributeSynsUniformly = False
+
+# print('[init] Creating connections ...')
 sim.net.connectCells()
 
-print('[init] Adding external stimuli ...')
+# print('[init] Adding external stimuli ...')
 sim.net.addStims()
 
-print('[init] Setting up recording ...')
+# print('[init] Setting up recording ...')
 sim.setupRecording()
 
-print('[init] Running simulation ...')
+# print('[init] Running simulation ...')
 sim.runSim()
 
-print('[init] Gathering data ...')
+# print('[init] Gathering data ...')
 sim.gatherData()
 
-print('[init] Saving data ...')
+# print('[init] Saving data ...')
 sim.saveData()
 
-print('[init] Plotting data ...')
+# print('[init] Plotting data ...')
 sim.analysis.plotData()           		# plot spikes, V traces, rasters, etc.

@@ -1,0 +1,112 @@
+mpiexec -n 20 python circuit.py 1234
+numprocs=20
+/home/fernando/anaconda3/envs/p38/lib/python3.8/site-packages/LFPy/network.py:796: UserWarning: argument delayfun=<built-in method normal of numpy.random.mtrand.RandomState object at 0x79fc236b5440> do not appear scipy.stats.rv_continuous or scipy.stats.rv_discrete like and will be deprecated in the future
+  warn(f'argument delayfun={delayfun.__str__()} do not appear ' +
+
+Mechanisms found:  True
+Importing, setting up MPI variables and loading necessary files took  0.076 minutes
+Running full simulation...
+Initiating HL23PYR population...
+Initiating HL23SST population...
+Initiating HL23PV population...
+Initiating HL23VIP population...
+Instantiating all populations took  7.705 minutes
+Connected population HL23PYR to HL23PYR by 96193.0 connections and 288579.0 synapses
+Connected population HL23PYR to HL23SST by 7672.0 connections and 61376.0 synapses
+Connected population HL23PYR to HL23PV by 5038.0 connections and 40304.0 synapses
+Connected population HL23PYR to HL23VIP by 5719.0 connections and 22876.0 synapses
+Connected population HL23SST to HL23PYR by 7619.0 connections and 91428.0 synapses
+Connected population HL23SST to HL23SST by 105.0 connections and 1260.0 synapses
+Connected population HL23SST to HL23PV by 687.0 connections and 8931.0 synapses
+Connected population HL23SST to HL23VIP by 221.0 connections and 1105.0 synapses
+Connected population HL23PV to HL23PYR by 5354.0 connections and 91018.0 synapses
+Connected population HL23PV to HL23SST by 195.0 connections and 3120.0 synapses
+Connected population HL23PV to HL23PV by 1773.0 connections and 26595.0 synapses
+Connected population HL23PV to HL23VIP by 180.0 connections and 1260.0 synapses
+Connected population HL23VIP to HL23PYR by 0.0 connections and 0.0 synapses
+Connected population HL23VIP to HL23SST by 1428.0 connections and 12852.0 synapses
+Connected population HL23VIP to HL23PV by 546.0 connections and 6006.0 synapses
+Connected population HL23VIP to HL23VIP by 328.0 connections and 2296.0 synapses
+Connecting populations took  8.589 minutes
+Simulating, recording SPIKES ... 
+Simulation took  375.4 minutes
+Saving simulation output ...
+Saving simulation took 375.4 minutes
+Creating/saving plots...
+Simulation complete
+Script completed in  375.7 minutes
+
+Script completed in 22542 sec
+
+mpiexec -n 20 nrniv -python -mpi init.py
+numprocs=20
+NEURON -- VERSION 8.2.2 HEAD (93d41fafd) 2022-12-15
+Duke, Yale, and the BlueBrain Project -- Copyright 1984-2022
+See http://neuron.yale.edu/neuron/credits
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+
+Start time:  2026-04-14 18:39:08.778979
+
+Creating network of 4 cell populations on 20 hosts...
+  Number of cells on node 0: 50 
+  Done; cell creation time = 0.94 s.
+Making connections...
+  Number of connections on node 0: 6664 
+  Number of synaptic contacts on node 0: 32673 
+  Done; cell connection time = 2.76 s.
+  Number of stims on node 0: 0 
+  Done; cell stims creation time = 0.00 s.
+Recording 3 traces of 1 types on node 0
+0.0s
+
+Running simulation using NEURON for 10000.0 ms...
+0.5s
+1.0s
+1.5s
+2.0s
+2.5s
+3.0s
+3.5s
+4.0s
+4.5s
+5.0s
+5.5s
+6.0s
+6.5s
+7.0s
+7.5s
+8.0s
+8.5s
+9.0s
+9.5s
+  Done; run time = 14615.47 s; real-time ratio: 0.00.
+
+Gathering data...
+  Done; gather time = 94.93 s.
+
+Analyzing...
+  Cells: 1000
+  Connections: 133058 (133.06 per cell)
+  Synaptic contacts: 659006 (659.01 per cell)
+  Spikes: 18754 (1.88 Hz)
+  Simulated time: 10.0 s; 20 workers
+  Run time: 14615.47 s
+   HL23PYR : 0.793 Hz
+   HL23SST : 5.478 Hz
+   HL23PV : 10.084 Hz
+   HL23VIP : 3.267 Hz
+Saving output as ../data/v1_batch1/v1_batch1_data.pkl ... 
+Finished saving!
+  Done; saving time = 13.84 s.
+Preparing spike data...
+Plotting raster...
+Plotting 2D representation of network cell locations and connections...
+Plotting recorded cell traces ... trace
+Plotting 3D cell shape ...
+Plotting connectivity matrix...
+Saving figure data as v1_batch1_matrix_numConn.json ... 
+  Done; plotting time = 84.83 s
+
+Total time = 14814.58 s
+

@@ -1,0 +1,267 @@
+numprocs=20
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 12: 50 
+  Number of connections on node 12: 6503 
+  Number of synaptic contacts on node 12: 32101 
+  Number of stims on node 12: 0 
+Recording 0 traces of 0 types on node 12
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 15: 50 
+  Number of connections on node 15: 6522 
+  Number of synaptic contacts on node 15: 32164 
+  Number of stims on node 15: 0 
+Recording 0 traces of 0 types on node 15
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 16: 50 
+  Number of connections on node 16: 6488 
+  Number of synaptic contacts on node 16: 31953 
+  Number of stims on node 16: 0 
+Recording 0 traces of 0 types on node 16
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 4: 50 
+  Number of connections on node 4: 6705 
+  Number of synaptic contacts on node 4: 32911 
+  Number of stims on node 4: 0 
+Recording 0 traces of 0 types on node 4
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 11: 50 
+  Number of connections on node 11: 6687 
+  Number of synaptic contacts on node 11: 33367 
+  Number of stims on node 11: 0 
+Recording 1 traces of 1 types on node 11
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 13: 50 
+  Number of connections on node 13: 6660 
+  Number of synaptic contacts on node 13: 32738 
+  Number of stims on node 13: 0 
+Recording 0 traces of 0 types on node 13
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 10: 50 
+  Number of connections on node 10: 6610 
+  Number of synaptic contacts on node 10: 32572 
+  Number of stims on node 10: 0 
+Recording 1 traces of 1 types on node 10
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 3: 50 
+  Number of connections on node 3: 6811 
+  Number of synaptic contacts on node 3: 34185 
+  Number of stims on node 3: 0 
+Recording 0 traces of 0 types on node 3
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 2: 50 
+  Number of connections on node 2: 6599 
+  Number of synaptic contacts on node 2: 32954 
+  Number of stims on node 2: 0 
+Recording 0 traces of 0 types on node 2
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 6: 50 
+  Number of connections on node 6: 6676 
+  Number of synaptic contacts on node 6: 33361 
+  Number of stims on node 6: 0 
+Recording 0 traces of 0 types on node 6
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 14: 50 
+  Number of connections on node 14: 6604 
+  Number of synaptic contacts on node 14: 33038 
+  Number of stims on node 14: 0 
+Recording 0 traces of 0 types on node 14
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 7: 50 
+  Number of connections on node 7: 6685 
+  Number of synaptic contacts on node 7: 32765 
+  Number of stims on node 7: 0 
+Recording 0 traces of 0 types on node 7
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 1: 50 
+  Number of connections on node 1: 6715 
+  Number of synaptic contacts on node 1: 32958 
+  Number of stims on node 1: 0 
+Recording 3 traces of 1 types on node 1
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 9: 50 
+  Number of connections on node 9: 6666 
+  Number of synaptic contacts on node 9: 32786 
+  Number of stims on node 9: 0 
+Recording 0 traces of 0 types on node 9
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 8: 50 
+  Number of connections on node 8: 6632 
+  Number of synaptic contacts on node 8: 32390 
+  Number of stims on node 8: 0 
+Recording 0 traces of 0 types on node 8
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 18: 50 
+  Number of connections on node 18: 6639 
+  Number of synaptic contacts on node 18: 32654 
+  Number of stims on node 18: 0 
+Recording 0 traces of 0 types on node 18
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 17: 50 
+  Number of connections on node 17: 6629 
+  Number of synaptic contacts on node 17: 32686 
+  Number of stims on node 17: 0 
+Recording 0 traces of 0 types on node 17
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 5: 50 
+  Number of connections on node 5: 6580 
+  Number of synaptic contacts on node 5: 32563 
+  Number of stims on node 5: 0 
+Recording 0 traces of 0 types on node 5
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+  Number of cells on node 19: 50 
+  Number of connections on node 19: 6731 
+  Number of synaptic contacts on node 19: 33373 
+  Number of stims on node 19: 0 
+Recording 0 traces of 0 types on node 19
+
+Reading command line arguments using syntax: python file.py [simConfig=filepath] [netParams=filepath]
+Loading file ../data/v1_batch3/v1_batch3_0_cfg.json ... 
+Loading simConfig...
+cfg.LOAD_MATRIX_LFPy == False, correction factor applied in Exc-Exc coonections gmax*=  0.945
+Importing netParams from ../data/v1_batch3/v1_batch3_netParams.py
+
+Start time:  2026-04-15 20:43:08.259334
+
+Creating network of 4 cell populations on 20 hosts...
+  Number of cells on node 0: 50 
+  Done; cell creation time = 1.00 s.
+Making connections...
+  Number of connections on node 0: 6641 
+  Number of synaptic contacts on node 0: 33032 
+  Done; cell connection time = 1.98 s.
+  Number of stims on node 0: 0 
+  Done; cell stims creation time = 0.00 s.
+Recording 3 traces of 1 types on node 0
+0.0s
+
+Running simulation using NEURON for 3000.0 ms...
+0.5s
+1.0s
+1.5s
+2.0s
+2.5s
+3.0s
+  Done; run time = 2152.67 s; real-time ratio: 0.00.
+
+Gathering data...
+  Done; gather time = 21.77 s.
+
+Analyzing...
+  Cells: 1000
+  Connections: 132783 (132.78 per cell)
+  Synaptic contacts: 656551 (656.55 per cell)
+  Spikes: 6219 (2.07 Hz)
+  Simulated time: 3.0 s; 20 workers
+  Run time: 2152.67 s
+   HL23PYR : 0.892 Hz
+   HL23SST : 5.413 Hz
+   HL23PV : 11.333 Hz
+   HL23VIP : 3.692 Hz
+Saving output as ../data/v1_batch3/v1_batch3_0_data.pkl ... 
+Finished saving!
+  Done; saving time = 0.70 s.
+Plotting 2D representation of network cell locations and connections...
+Plotting connectivity matrix...
+Saving figure data as v1_batch1_matrix_numConn.json ... 
+Preparing spike data...
+Plotting raster...
+Plotting 3D cell shape ...
+Plotting recorded cell traces ... trace
+  Done; plotting time = 54.98 s
+
+Total time = 2233.66 s
