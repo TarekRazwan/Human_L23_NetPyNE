@@ -1,25 +1,42 @@
 === Yao 2022 Healthy Model Validation Report ===
-Date: 2026-03-01 11:08
-Seeds evaluated (healthy): [1234]
-Seeds evaluated (SST-silenced): []
+Date: 2026-06-05 18:09
+Seeds evaluated: ['v1_batch3_0']
+Duration: 3000.0 ms, transient: 0.0 ms, dt: 0.025 ms
 
-FIRING RATES (mean ± SD, non-silent >0.2 Hz, t>2000ms):
-Population   | Our value      | Paper target   | % error 
-----------------------------------------------------------
-PYR          | 0.80 ± 0.00 Hz     | 1.20 ± 0.20 Hz    | -33.7%
-SST          | 10.18 ± 0.00 Hz     | 5.62 ± 0.27 Hz    | +81.2%
-PV           | 2.78 ± 0.00 Hz     | 10.19 ± 0.51 Hz    | -72.7%
-VIP          | 3.20 ± 0.00 Hz     | 3.52 ± 0.37 Hz    | -9.1%
+PRIMARY RATES — all cells, full window [0, 3000] ms
+  (Definition: total_spikes / num_cells / duration_s)
+  (This matches NetPyNE printPopAvgRates output)
 
-PER-SEED RATES:
-Seed    PYR       SST       PV        VIP     
-  1234  0.80 Hz  10.18 Hz  2.78 Hz  3.20 Hz
+Population   | Our value      | LFPy ref   | Yao target     | % err vs Yao
+------------------------------------------------------------------------
+PYR          | 1.668 +/- 0.000 Hz | 0.784 Hz   | 1.20 +/- 0.20 Hz  | +39.0%
+SST          | 1.800 +/- 0.000 Hz | 5.544 Hz   | 5.62 +/- 0.27 Hz  | -68.0%
+PV           | 1.571 +/- 0.000 Hz | 9.944 Hz   | 10.19 +/- 0.51 Hz  | -84.6%
+VIP          | 1.654 +/- 0.000 Hz | 3.266 Hz   | 3.52 +/- 0.37 Hz  | -53.0%
 
-SST silencing: insufficient shared seeds (0) — need ≥2.
+PER-SEED PRIMARY RATES:
+Seed                  PYR         SST         PV          VIP       
+v1_batch3_0              1.668 Hz     1.800 Hz     1.571 Hz     1.654 Hz
+
+NetPyNE popRates (from pkl, v1_batch3_0):
+  PYR   : 0.892 Hz
+  SST   : 5.413 Hz
+  PV    : 11.333 Hz
+  VIP   : 3.692 Hz
+
+SECONDARY RATES — non-silent cells only (>0.2 Hz), window [0, 3000] ms
+  (Definition: mean of per-cell rates for cells firing >0.2 Hz)
+  (This matches the Yao 2022 Table S2 reporting convention)
+
+Population   | Our value      | Yao target     | % err vs Yao
+------------------------------------------------------------
+PYR          | 1.683 +/- 0.000 Hz | 1.20 +/- 0.20 Hz  | +40.2%
+SST          | 1.837 +/- 0.000 Hz | 5.62 +/- 0.27 Hz  | -67.3%
+PV           | 1.594 +/- 0.000 Hz | 10.19 +/- 0.51 Hz  | -84.4%
+VIP          | 1.697 +/- 0.000 Hz | 3.52 +/- 0.37 Hz  | -51.8%
 
 GENERATED PLOTS:
-  fig2C_raster.png  (110 KB)
-  fig2D_baseline_rates.png  (78 KB)
-  fig2E_SST_silencing.png  — NOT GENERATED
-  fig2F_voltage_traces.png  (75 KB)
-  fig2G_spike_PSD.png  (311 KB)
+  fig2C_raster.png  (100 KB)
+  fig2D_baseline_rates.png  (72 KB)
+  fig2F_voltage_traces.png  -- NOT GENERATED
+  fig2G_spike_PSD.png  (241 KB)

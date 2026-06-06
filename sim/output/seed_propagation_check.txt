@@ -1,0 +1,62 @@
+=== Seed Propagation Verification ===
+Date: 2026-06-05 19:08
+
+This file proves that sweeping GLOBALSEED in batch.py correctly
+propagates to all four NetPyNE seed channels (conn, stim, loc, cell)
+and the OU noise path (SEED = GLOBALSEED * 10000).
+
+The dual-derivation mechanism:
+  1. cfg.py: seeds derived from GLOBALSEED (handles standalone runs)
+  2. init.py: re-derives seeds from cfg.GLOBALSEED after loading cfg
+     (catches batch runs where JSON snapshot has stale seeds)
+
+Verification simulates the full batch->JSON->init pipeline:
+  - batch loads cfg.py, overrides GLOBALSEED, saves to JSON
+  - init.py loads JSON, re-derives seeds from GLOBALSEED
+
+--- GLOBALSEED = 1234 ---
+  After cfg.py load:
+    cfg.GLOBALSEED = 1234
+    cfg.seeds      = {'conn': 1234, 'stim': 1234, 'loc': 1234, 'cell': 1234}
+  After batch override (GLOBALSEED = 1234):
+    cfg.GLOBALSEED = 1234
+    cfg.seeds      = {'conn': 1234, 'stim': 1234, 'loc': 1234, 'cell': 1234}
+  After JSON round-trip (batch saves, init.py loads):
+    cfg.GLOBALSEED = 1234
+    cfg.seeds      = {'cell': 1234, 'conn': 1234, 'loc': 1234, 'stim': 1234}
+  After init.py re-derivation (safety net):
+    cfg.seeds      = {'conn': 1234, 'stim': 1234, 'loc': 1234, 'cell': 1234}
+    OU SEED        = 12340000  (GLOBALSEED * 10000)
+
+  RESULT: IDENTICAL to original baseline.
+    conn=1234, stim=1234, loc=1234, cell=1234, OU=12340000
+
+--- GLOBALSEED = 1235 ---
+  After cfg.py load:
+    cfg.GLOBALSEED = 1234
+    cfg.seeds      = {'conn': 1234, 'stim': 1234, 'loc': 1234, 'cell': 1234}
+  After batch override (GLOBALSEED = 1235):
+    cfg.GLOBALSEED = 1235
+    cfg.seeds      = {'conn': 1234, 'stim': 1234, 'loc': 1234, 'cell': 1234}
+    ^^^ seeds STALE: still 1234 from cfg.py load
+  After JSON round-trip (batch saves, init.py loads):
+    cfg.GLOBALSEED = 1235
+    cfg.seeds      = {'cell': 1234, 'conn': 1234, 'loc': 1234, 'stim': 1234}
+  After init.py re-derivation (safety net):
+    cfg.seeds      = {'conn': 1235, 'stim': 1235, 'loc': 1235, 'cell': 1235}
+    OU SEED        = 12350000  (GLOBALSEED * 10000)
+
+  RESULT: ALL CHANNELS DIFFER from seed 1234.
+    conn=1235, stim=1235, loc=1235, cell=1235, OU=12350000
+
+OU path confirmation:
+  init.py line 47: GLOBALSEED = int(cfg.GLOBALSEED)
+  init.py line 50: SEED = GLOBALSEED * 10000
+  cfg.GLOBALSEED is read at runtime AFTER sim.readCmdLineArgs()
+  loads the JSON. The JSON carries the batch-overridden value.
+  There is no import-time capture — the OU path correctly varies.
+
+Conclusion: the 5-seed baseline lock (GLOBALSEED = 1234..1238)
+produces genuinely different networks with different connectivity,
+placement, rotation, and OU noise. Seed 1234 is identical to the
+original single-seed baseline.

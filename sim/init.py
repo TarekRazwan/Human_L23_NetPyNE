@@ -28,6 +28,24 @@ cfg, netParams = sim.readCmdLineArgs()
 # sim.create(netParams, cfg)
 # sim.createSimulateAnalyze(netParams, cfg)
 
+# ---------------------------------------------------------------------------
+# Re-derive NetPyNE seed channels from GLOBALSEED (batch safety net).
+# Why this is needed: batch.py overrides cfg.GLOBALSEED in the serialized
+# cfg JSON, but the cfg.seeds dict in that JSON is stale (built when cfg.py
+# was first loaded, before the override). cfg.py is NOT re-executed on the
+# batch load path — init.py loads from JSON via sim.loadSimCfg(). This
+# re-derivation catches the stale seeds. For standalone runs (cfg loaded
+# from cfg.py) this is a no-op since cfg.seeds already equals GLOBALSEED.
+# Nothing between readCmdLineArgs() and this block reads cfg.seeds;
+# the first consumer is sim.initialize() below.
+# ---------------------------------------------------------------------------
+cfg.seeds = {
+    'conn': cfg.GLOBALSEED,
+    'stim': cfg.GLOBALSEED,
+    'loc':  cfg.GLOBALSEED,
+    'cell': cfg.GLOBALSEED,
+}
+
 #MPI variables:
 COMM = MPI.COMM_WORLD
 SIZE = COMM.Get_size()

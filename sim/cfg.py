@@ -10,15 +10,15 @@ cfg = specs.SimConfig()
 # ---------------------------------------------------------------------------
 # Identity / I/O
 # ---------------------------------------------------------------------------
-cfg.simLabel = 'v1_batch3'       #   + str(cfg.cynradNumber)
+cfg.simLabel = 'v1_batch5_lock'
 cfg.saveFolder = '../data/'+cfg.simLabel
 cfg.savePickle  = True
 cfg.saveJson    = False   # disabled for speed — spikes saved as .npy per seed
 
-cfg.saveDataInclude = ['simData' , 'simConfig', 'netParams', 'netParams']
-cfg.backupCfgFile = None 		##  
-cfg.gatherOnlySimData = False	##  
-cfg.saveCellSecs = True			##  
+cfg.saveDataInclude = ['simData', 'simConfig', 'netParams', 'net']
+cfg.backupCfgFile = None 		##
+cfg.gatherOnlySimData = False	##
+cfg.saveCellSecs = True			## include morphology for LFP/EEG analysis
 cfg.saveCellConns = True		##  
 
 cfg.verbose = False
@@ -40,12 +40,26 @@ cfg.checkErrors = False
 # ---------------------------------------------------------------------------
 cfg.duration = 3000.0    # ms
 cfg.dt       = 0.025     # ms  (40 kHz)
+cfg.transient = 0.0      # ms — analysis window starts here (0 = full run, matches NetPyNE popAvgRates)
+cfg.testing   = False    # when True, analysis skips transient cutoff
 
 # ---------------------------------------------------------------------------
 # Random seeds
+# GLOBALSEED is the single master seed swept by batch.py.
+# All four NetPyNE seed channels are derived from it so that a single
+# batch parameter controls connectivity, placement, rotation, and stimulus.
+# OU background noise also keys off GLOBALSEED (via init.py).
+# To later fix anatomy and vary only noise (e.g. TMS on a fixed H01
+# substrate), override cfg.seeds['conn'/'loc'/'cell'] to constants
+# after this block while still sweeping GLOBALSEED for the OU path.
 # ---------------------------------------------------------------------------
-cfg.seeds = {'conn':  1234, 'stim':  1234, 'loc':   1234, 'cell':  1234}
 cfg.GLOBALSEED = 1234
+cfg.seeds = {
+    'conn': cfg.GLOBALSEED,   # connectivity wiring
+    'stim': cfg.GLOBALSEED,   # external stimulus (not yet implemented)
+    'loc':  cfg.GLOBALSEED,   # cell spatial placement
+    'cell': cfg.GLOBALSEED,   # cell rotation
+}
 cfg.DRUG = False
 
 # ---------------------------------------------------------------------------
@@ -126,7 +140,7 @@ cfg.analysis['plotShape'] = {'includePre':  cfg.allpops,'includePost': cfg.allpo
                                 'saveFig': True, 'figSize':(24,24)}
 
 cfg.analysis['plotConn'] = {'includePre': cfg.allpops, 'includePost': cfg.allpops, 'feature': 'numConns', 'groupBy': 'pop', 'figSize': (24,24), 
-                            'saveFig': True, 'orderBy': 'gid', 'graphType': 'matrix', 'saveData':'v1_batch1_matrix_numConn.json', 'fontSize': 18}
+                            'saveFig': True, 'orderBy': 'gid', 'graphType': 'matrix', 'saveData': None, 'fontSize': 18}
 
 
 #------------------------------------------------------------------------------

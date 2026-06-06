@@ -1,0 +1,21 @@
+
+# macOS
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# NEURON compiled mechanisms
+arm64/
+x86_64/
+
+# Large/generated simulation files
+*.pkl
+*.h5
+*.mat
+
+# Runtime logs
+*.log
+*.run
+*.err
