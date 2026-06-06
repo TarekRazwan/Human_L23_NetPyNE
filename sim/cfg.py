@@ -63,6 +63,13 @@ cfg.seeds = {
 cfg.DRUG = False
 
 # ---------------------------------------------------------------------------
+# H01 integration — real EM positions + distance-dependent connectivity
+# Set USE_H01_DISTANCE_CONN = False to recover the flat-probability baseline.
+# ---------------------------------------------------------------------------
+cfg.USE_H01_DISTANCE_CONN = True
+cfg.H01_CSV_PATH = '../data/cell_positions_h01_rotated_full.csv'
+
+# ---------------------------------------------------------------------------
 # LFP recording electrode (only used when cfg.rec_LFP = True)
 # ---------------------------------------------------------------------------
 # cfg.recordLFP = [[0.0, 0.0, 5.0]]

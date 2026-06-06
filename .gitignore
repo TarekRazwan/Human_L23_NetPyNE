@@ -19,6 +19,9 @@ x86_64/
 *.mat
 data/v1_batch*/
 
+# H01 source data (large CSV, not committed — copy to HPC separately)
+data/cell_positions_h01_rotated*.csv
+
 # Transcriptomic raw data and caches
 *.h5ad
 transcriptomic/cache/

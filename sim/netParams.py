@@ -336,24 +336,56 @@ if cfg.LOAD_MATRIX_LFPy:
     
 
 else:
-    L23_UPPER  = -250   # µm
-    L23_LOWER  = -1200  # µm
-    L23_RADIUS =  250   # µm
-    L23_UPPER_soma  = -550   # µm
-    L23_LOWER_soma = -1500  # µm
+    if getattr(cfg, 'USE_H01_DISTANCE_CONN', False):
+        # ---------------------------------------------------------------
+        # H01 real-coordinate placement (Decision 3).
+        # Cells are placed at real H01 EM soma positions (translation +
+        # y-inversion only — pairwise distances preserved exactly).
+        # The resulting slab is ~598 x 801 x 174 µm, NOT a 500^3 cube.
+        # ---------------------------------------------------------------
+        sys.path.insert(0, os.path.abspath(os.path.join('..', 'h01_integration')))
+        import h01_placement
 
-    for cellName in cfg.allpops:
+        h01_positions = h01_placement.get_all_population_positions(
+            cfg.H01_CSV_PATH, cfg.GLOBALSEED, cfg.cellNumber)
 
-        num_cells = cfg.cellNumber[cellName]
+        for cellName in cfg.allpops:
+            cellsList = [{'x': p[0], 'y': p[1], 'z': p[2]}
+                         for p in h01_positions[cellName]]
+            netParams.popParams[cellName] = {
+                'cellType':  cellName,
+                'cellModel': 'HH_full',
+                'cellsList': cellsList,
+            }
 
-        netParams.popParams[cellName] = {
-            'cellType':  cellName,
-            'cellModel': 'HH_full',
-            'numCells':  num_cells,
-            'xRange': [0, 2*L23_RADIUS],
-            'zRange': [0, 2*L23_RADIUS],
-            'yRange': layer['23soma'],
-        }
+        # Expand volume bounds to contain the real H01 slab (avoids xnorm > 1)
+        _all_pos = [p for pop in h01_positions.values() for p in pop]
+        netParams.sizeX = max(p[0] for p in _all_pos) + 50
+        netParams.sizeY = max(p[1] for p in _all_pos) + 50
+        netParams.sizeZ = max(p[2] for p in _all_pos) + 50
+
+    else:
+        # ---------------------------------------------------------------
+        # Original Yao random placement (flat probability baseline)
+        # ---------------------------------------------------------------
+        L23_UPPER  = -250   # µm
+        L23_LOWER  = -1200  # µm
+        L23_RADIUS =  250   # µm
+        L23_UPPER_soma  = -550   # µm
+        L23_LOWER_soma = -1500  # µm
+
+        for cellName in cfg.allpops:
+
+            num_cells = cfg.cellNumber[cellName]
+
+            netParams.popParams[cellName] = {
+                'cellType':  cellName,
+                'cellModel': 'HH_full',
+                'numCells':  num_cells,
+                'xRange': [0, 2*L23_RADIUS],
+                'zRange': [0, 2*L23_RADIUS],
+                'yRange': layer['23soma'],
+            }
 
 # print(netParams.popParams)
 
@@ -516,7 +548,37 @@ for pre in cfg.allpops:
 #------------------------------------------------------------------------------
 # ConnParams
 #------------------------------------------------------------------------------
-if cfg.LOAD_MATRIX_LFPy:   
+
+# --- H01 distance-dependent renormalization (computed once, before loop) ---
+# A_renorm scales each (pre,post) exponential so that the expected connection
+# probability averaged over real pairwise distances equals the Yao flat value.
+_h01_prob_expr = {}
+if getattr(cfg, 'USE_H01_DISTANCE_CONN', False) and not cfg.LOAD_MATRIX_LFPy:
+    import h01_connectivity as h01c
+    # conn_probs as nested dict pre->{post->p} for compute_renorm_A
+    _conn_probs_dict = {}
+    for _pre in cfg.allpops:
+        _conn_probs_dict[_pre] = {}
+        for _post in cfg.allpops:
+            _conn_probs_dict[_pre][_post] = float(circuit_params['conn_probs'].at[_pre, _post])
+    # Reuse the SAME h01_positions used for placement (consistency)
+    _A_renorm = h01c.compute_renorm_A(
+        {pop: np.array(pos) for pop, pos in h01_positions.items()},
+        _conn_probs_dict)
+    for _pre in cfg.allpops:
+        for _post in cfg.allpops:
+            if _conn_probs_dict[_pre][_post] > 0:
+                _h01_prob_expr[(_pre, _post)] = h01c.probability_expr(_pre, _post, _A_renorm)
+    # Sanity report: expected convergence
+    _n_cont_dict = {_pre: {_post: float(circuit_params['n_cont'].at[_pre, _post])
+                           for _post in cfg.allpops} for _pre in cfg.allpops}
+    _, _total, _per_cell = h01c.expected_convergence(
+        {pop: np.array(pos) for pop, pos in h01_positions.items()},
+        _conn_probs_dict, _n_cont_dict, _A_renorm)
+    print(f'[H01] Expected convergence: {_per_cell:.1f} contacts/cell '
+          f'(total {_total:.0f}, target ~656)')
+
+if cfg.LOAD_MATRIX_LFPy:
     OUTPUTPATH = "../data/L23Net_LFPy/Circuit_output/"
     filename = os.path.join(OUTPUTPATH,'synapse_connections.h5')
     f = h5py.File(filename, 'r')
@@ -568,12 +630,18 @@ for pre in cfg.allpops:
                                                             }     
 
 
-            else:             
-                netParams.connParams[pre + '->' + post] = {'preConds': {'cellType': pre}, 
-                                                            'postConds': {'cellType': post},  #  E -> all (100-1000 um) ,'y': [0,5000]
-                                                            'probability': circuit_params['conn_probs'].at[pre, post],                  # probability of connection
-                                                            'weight': 1.0,         # synaptic weight 
-                                                            'delay': 0.5,      # transmission delay (ms) 
+            else:
+                # H01 distance rule: 'A*exp(-dist_3D/lambda)' or flat Yao probability
+                if (pre, post) in _h01_prob_expr:
+                    _prob = _h01_prob_expr[(pre, post)]
+                else:
+                    _prob = circuit_params['conn_probs'].at[pre, post]
+
+                netParams.connParams[pre + '->' + post] = {'preConds': {'cellType': pre},
+                                                            'postConds': {'cellType': post},
+                                                            'probability': _prob,
+                                                            'weight': 1.0,         # synaptic weight
+                                                            'delay': 0.5,      # transmission delay (ms)
                                                             'synMech': pre+post,
                                                             'synsPerConn': int(circuit_params['n_cont'].at[pre, post]),
                                                             'sec': 'spiny',
