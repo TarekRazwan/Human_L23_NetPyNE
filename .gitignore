@@ -18,6 +18,7 @@ x86_64/
 *.h5
 *.mat
 data/v1_batch*/
+data/h01_*/
 
 # H01 source data (large CSV, not committed — copy to HPC separately)
 data/cell_positions_h01_rotated*.csv

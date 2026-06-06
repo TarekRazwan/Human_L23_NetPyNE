@@ -289,24 +289,6 @@ sim.cfg.distributeSynsUniformly = False
 # print('[init] Creating connections ...')
 sim.net.connectCells()
 
-# --- H01 dist_3D diagnostic (rank 0 only, remove after verification) ---
-if RANK == 0 and getattr(cfg, 'USE_H01_DISTANCE_CONN', False):
-    _cells = sim.net.cells
-    _sample_dists = []
-    for _c in _cells[:5]:
-        _cx, _cy, _cz = _c.tags['x'], _c.tags['y'], _c.tags['z']
-        for _conn in _c.conns[:3]:
-            _pre_gid = _conn.get('preGid', -1)
-            _pre_cell = next((c for c in _cells if c.gid == _pre_gid), None)
-            if _pre_cell:
-                _px, _py, _pz = _pre_cell.tags['x'], _pre_cell.tags['y'], _pre_cell.tags['z']
-                _d = ((float(_cx)-float(_px))**2 + (float(_cy)-float(_py))**2 + (float(_cz)-float(_pz))**2)**0.5
-                _sample_dists.append(_d)
-    if _sample_dists:
-        print(f'[H01-diag] Sample dist_3D values (um): {[f"{d:.1f}" for d in _sample_dists]}')
-        print(f'[H01-diag] Range: [{min(_sample_dists):.1f}, {max(_sample_dists):.1f}] um '
-              f'(expect 0-600, matching lambda scale 52-101 um)')
-
 # print('[init] Adding external stimuli ...')
 sim.net.addStims()
 
