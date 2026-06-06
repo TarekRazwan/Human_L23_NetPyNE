@@ -15,7 +15,7 @@ cfg.saveFolder = '../data/'+cfg.simLabel
 cfg.savePickle  = True
 cfg.saveJson    = False   # disabled for speed — spikes saved as .npy per seed
 
-cfg.saveDataInclude = ['simData', 'simConfig', 'netParams', 'net']
+cfg.saveDataInclude = ['simData', 'simConfig', 'netParams', 'netCells']
 cfg.backupCfgFile = None 		##
 cfg.gatherOnlySimData = False	##
 cfg.saveCellSecs = True			## include morphology for LFP/EEG analysis

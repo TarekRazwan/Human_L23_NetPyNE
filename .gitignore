@@ -1,10 +1,13 @@
-
 # macOS
 .DS_Store
+**/.DS_Store
 
 # Python cache
 __pycache__/
 *.pyc
+
+# Python virtual environments
+transcriptomic/.venv/
 
 # NEURON compiled mechanisms
 arm64/
@@ -14,6 +17,13 @@ x86_64/
 *.pkl
 *.h5
 *.mat
+data/v1_batch*/
+
+# Transcriptomic raw data and caches
+*.h5ad
+transcriptomic/cache/
+data/transcriptomic/*.h5ad
+abc_atlas_cache/
 
 # Runtime logs
 *.log

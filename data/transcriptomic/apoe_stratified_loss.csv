@@ -1,0 +1,33 @@
+population,APOE4_status,cps_quartile,n_donors,mean_proportion,sem,survival_fraction,underpowered
+PV,APOE4 non-carrier,Q1 (lowest),17,0.083721,0.002494,1.000000,False
+PYR,APOE4 non-carrier,Q1 (lowest),17,0.324045,0.013194,1.000000,False
+SST,APOE4 non-carrier,Q1 (lowest),17,0.057397,0.005657,1.000000,False
+VIP,APOE4 non-carrier,Q1 (lowest),17,0.100348,0.004159,1.000000,False
+PV,APOE4 non-carrier,Q2,15,0.080007,0.002308,0.955637,False
+PYR,APOE4 non-carrier,Q2,15,0.319474,0.014242,0.985895,False
+SST,APOE4 non-carrier,Q2,15,0.047421,0.004178,0.826192,False
+VIP,APOE4 non-carrier,Q2,15,0.091293,0.005770,0.909759,False
+PV,APOE4 non-carrier,Q3,11,0.089614,0.003170,1.070383,False
+PYR,APOE4 non-carrier,Q3,11,0.275628,0.018908,0.850587,False
+SST,APOE4 non-carrier,Q3,11,0.050776,0.006567,0.884642,False
+VIP,APOE4 non-carrier,Q3,11,0.113210,0.010837,1.128172,False
+PV,APOE4 non-carrier,Q4 (highest),6,0.075735,0.002936,0.904609,False
+PYR,APOE4 non-carrier,Q4 (highest),6,0.273263,0.044238,0.843288,False
+SST,APOE4 non-carrier,Q4 (highest),6,0.039360,0.004439,0.685747,False
+VIP,APOE4 non-carrier,Q4 (highest),6,0.093845,0.012332,0.935192,False
+PV,APOE4 carrier,Q1 (lowest),1,0.087486,,1.000000,True
+PYR,APOE4 carrier,Q1 (lowest),1,0.355930,,1.000000,True
+SST,APOE4 carrier,Q1 (lowest),1,0.065832,,1.000000,True
+VIP,APOE4 carrier,Q1 (lowest),1,0.106638,,1.000000,True
+PV,APOE4 carrier,Q2,2,0.088184,0.015203,1.007977,True
+PYR,APOE4 carrier,Q2,2,0.289925,0.015084,0.814556,True
+SST,APOE4 carrier,Q2,2,0.053262,0.020918,0.809054,True
+VIP,APOE4 carrier,Q2,2,0.097000,0.005279,0.909618,True
+PV,APOE4 carrier,Q3,6,0.077805,0.007499,0.889344,False
+PYR,APOE4 carrier,Q3,6,0.350492,0.040949,0.984721,False
+SST,APOE4 carrier,Q3,6,0.033244,0.004978,0.504977,False
+VIP,APOE4 carrier,Q3,6,0.071697,0.005808,0.672339,False
+PV,APOE4 carrier,Q4 (highest),11,0.086369,0.005318,0.987224,False
+PYR,APOE4 carrier,Q4 (highest),11,0.287920,0.019228,0.808923,False
+SST,APOE4 carrier,Q4 (highest),11,0.043301,0.006130,0.657751,False
+VIP,APOE4 carrier,Q4 (highest),11,0.087373,0.007917,0.819340,False
