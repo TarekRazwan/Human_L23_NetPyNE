@@ -1,0 +1,60 @@
+=================================================================
+  Yao 2022 L23 Healthy Model — Validation Report
+=================================================================
+Date:  2026-06-06 03:40
+Seeds: 5 pkls loaded
+
+PKL FILES:
+  v1_batch5_lock_0                GLOBALSEED=1234
+  v1_batch5_lock_1                GLOBALSEED=1235
+  v1_batch5_lock_2                GLOBALSEED=1236
+  v1_batch5_lock_3                GLOBALSEED=1237
+  v1_batch5_lock_4                GLOBALSEED=1238
+
+-----------------------------------------------------------------
+PRIMARY RATES — all cells, full window (NetPyNE printPopAvgRates)
+  Analysis window: 0 – 3000 ms
+-----------------------------------------------------------------
+Population   | Our value        | Paper target     | % err  
+----------------------------------------------------------
+PYR          |  0.88 +/-  0.04 Hz |  1.20 +/- 0.20 Hz  | -26.6%
+SST          |  5.39 +/-  0.24 Hz |  5.62 +/- 0.27 Hz  | -4.0%
+PV           | 11.10 +/-  0.51 Hz | 10.19 +/- 0.51 Hz  | +9.0%
+VIP          |  3.63 +/-  0.27 Hz |  3.52 +/- 0.37 Hz  | +3.1%
+
+PER-SEED (all-cells):
+  Label                                PYR       SST        PV       VIP
+  v1_batch5_lock_0                    0.89      5.41     11.33      3.69
+  v1_batch5_lock_1                    0.85      5.42     10.49      3.52
+  v1_batch5_lock_2                    0.88      5.15     11.28      3.47
+  v1_batch5_lock_3                    0.84      5.21     10.69      3.40
+  v1_batch5_lock_4                    0.95      5.77     11.73      4.07
+
+-----------------------------------------------------------------
+SECONDARY RATES — non-silent cells only (>0.2 Hz, Yao Table S2)
+-----------------------------------------------------------------
+Population   | Our value        | Paper target     | % err  
+----------------------------------------------------------
+PYR          |  0.88 +/-  0.04 Hz |  1.20 +/- 0.20 Hz  | -26.5%
+SST          |  5.39 +/-  0.24 Hz |  5.62 +/- 0.27 Hz  | -4.0%
+PV           | 11.10 +/-  0.51 Hz | 10.19 +/- 0.51 Hz  | +9.0%
+VIP          |  3.63 +/-  0.27 Hz |  3.52 +/- 0.37 Hz  | +3.1%
+
+PER-SEED (non-silent):
+  Label                                PYR       SST        PV       VIP
+  v1_batch5_lock_0                    0.90      5.41     11.33      3.69
+  v1_batch5_lock_1                    0.85      5.42     10.49      3.52
+  v1_batch5_lock_2                    0.88      5.15     11.28      3.47
+  v1_batch5_lock_3                    0.84      5.21     10.69      3.40
+  v1_batch5_lock_4                    0.95      5.77     11.73      4.07
+
+-----------------------------------------------------------------
+CONNECTIVITY
+-----------------------------------------------------------------
+  v1_batch5_lock_0                cells=1000  conns=656551  (656.55/cell)  syn_contacts=656551  (656.55/cell)
+  v1_batch5_lock_1                cells=1000  conns=659470  (659.47/cell)  syn_contacts=659470  (659.47/cell)
+  v1_batch5_lock_2                cells=1000  conns=655323  (655.32/cell)  syn_contacts=655323  (655.32/cell)
+  v1_batch5_lock_3                cells=1000  conns=652481  (652.48/cell)  syn_contacts=652481  (652.48/cell)
+  v1_batch5_lock_4                cells=1000  conns=655382  (655.38/cell)  syn_contacts=655382  (655.38/cell)
+
+=================================================================
