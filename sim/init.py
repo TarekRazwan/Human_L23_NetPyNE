@@ -29,6 +29,66 @@ cfg, netParams = sim.readCmdLineArgs()
 # sim.createSimulateAnalyze(netParams, cfg)
 
 # ---------------------------------------------------------------------------
+# AD modifier layer — applied AFTER readCmdLineArgs so cfg holds the per-run
+# JSON values (ad_stage, enable_* flags), not the cfg.py import-time defaults.
+# ---------------------------------------------------------------------------
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.abspath(_os.path.join('..', 'ad_layer')))
+import ad_modifiers as adm
+
+_ad_cfg = adm.ADModConfig(
+    s                       = float(getattr(cfg, 'ad_stage', 0.0)),
+    enable_M1a_sst_syn      = bool(getattr(cfg, 'enable_M1a_sst_syn', False)),
+    enable_M1b_tonic        = bool(getattr(cfg, 'enable_M1b_tonic', False)),
+    enable_M1c_sst_loss     = bool(getattr(cfg, 'enable_M1c_sst_loss', False)),
+    enable_M2_pv_kv31       = bool(getattr(cfg, 'enable_M2_pv_kv31', False)),
+    enable_M3_exc_scaffold  = bool(getattr(cfg, 'enable_M3_exc_scaffold', False)),
+    enable_M4_pyr_loss      = bool(getattr(cfg, 'enable_M4_pyr_loss', False)),
+)
+_mods = adm.compute_modifiers(_ad_cfg)
+print(f'[AD] s={_ad_cfg.s:.2f}  all_off={_ad_cfg.all_off()}  mods={_mods}')
+
+# M1b: pass tonic GABA multiplier to insert_tonic_gaba (called later in this file)
+cfg._ad_g_tonic = _mods['g_tonic']
+
+# M2: PV Kv3.1 gbar in somatic + axonal sections
+# ACCESS PATH (⚠ UNVERIFIED — needs HPC check against live built netParams):
+#   netParams.cellParams['HL23PV']['secs'][sec_name]['mechs']['Kv3_1']['gbar']
+# Source: biophys_HL23PV.hoc has gbar_Kv3_1 ≈ 2.992 (somatic) / 2.989 (axonal).
+# importCellParams captures this into secs[sec]['mechs']['Kv3_1']['gbar'].
+if _mods['gbar_Kv3_1'] != 1.0:
+    _pv_secs = netParams.cellParams['HL23PV']['secs']
+    _pv_lists = netParams.cellParams['HL23PV'].get('secLists', {})
+    for _sn in _pv_lists.get('somatic', []) + _pv_lists.get('axonal', []):
+        _mechs = _pv_secs[_sn].get('mechs', {})
+        if 'Kv3_1' in _mechs:
+            _mechs['Kv3_1']['gbar'] *= _mods['gbar_Kv3_1']
+
+# M3: AMPA/NMDA — scale gmax (AMPA) + set weight_factor_NMDA for asymmetry
+# ACCESS PATH (⚠ UNVERIFIED — needs HPC check against live built netParams):
+#   netParams.synMechParams[key]['gmax']           — shared AMPA/NMDA peak conductance
+#   netParams.synMechParams[key]['weight_factor_NMDA'] — NMDA weight relative to AMPA
+# Source: ProbAMPANMDA.mod NET_RECEIVE uses weight*factor for AMPA,
+#   weight*weight_factor_NMDA*factor for NMDA. gmax scales both equally.
+if _mods['g_AMPA'] != 1.0 or _mods['g_NMDA'] != 1.0:
+    _nmda_ratio = _mods['g_NMDA'] / _mods['g_AMPA'] if _mods['g_AMPA'] > 0 else 1.0
+    for _key, _syn in netParams.synMechParams.items():
+        if _syn.get('mod') == 'ProbAMPANMDA':
+            _syn['gmax'] *= _mods['g_AMPA']
+            _syn['weight_factor_NMDA'] = _nmda_ratio
+
+# M1a × M1c: SST presynaptic weight; M4: PYR presynaptic weight
+_sst_w = _mods['w_SST_pre'] * _mods['eff_SST']
+_pyr_w = _mods['eff_PYR']
+if _sst_w != 1.0 or _pyr_w != 1.0:
+    for _rn, _r in netParams.connParams.items():
+        _pre = _r.get('preConds', {}).get('cellType', '')
+        if _pre == 'HL23SST' and _sst_w != 1.0:
+            _r['weight'] = float(_r.get('weight', 1.0)) * _sst_w
+        elif _pre == 'HL23PYR' and _pyr_w != 1.0:
+            _r['weight'] = float(_r.get('weight', 1.0)) * _pyr_w
+
+# ---------------------------------------------------------------------------
 # Re-derive NetPyNE seed channels from GLOBALSEED (batch safety net).
 # Why this is needed: batch.py overrides cfg.GLOBALSEED in the serialized
 # cfg JSON, but the cfg.seeds dict in that JSON is stale (built when cfg.py

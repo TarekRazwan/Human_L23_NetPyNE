@@ -13,27 +13,6 @@ import h5py
 
 from cfg import cfg
 
-# ---------------------------------------------------------------------------
-# AD modifier layer — compute multipliers once, apply to named handles below
-# ---------------------------------------------------------------------------
-sys.path.insert(0, os.path.abspath(os.path.join('..', 'ad_layer')))
-import ad_modifiers as adm
-
-_ad_cfg = adm.ADModConfig(
-    s                       = float(getattr(cfg, 'ad_stage', 0.0)),
-    enable_M1a_sst_syn      = bool(getattr(cfg, 'enable_M1a_sst_syn', False)),
-    enable_M1b_tonic        = bool(getattr(cfg, 'enable_M1b_tonic', False)),
-    enable_M1c_sst_loss     = bool(getattr(cfg, 'enable_M1c_sst_loss', False)),
-    enable_M2_pv_kv31       = bool(getattr(cfg, 'enable_M2_pv_kv31', False)),
-    enable_M3_exc_scaffold  = bool(getattr(cfg, 'enable_M3_exc_scaffold', False)),
-    enable_M4_pyr_loss      = bool(getattr(cfg, 'enable_M4_pyr_loss', False)),
-)
-_mods = adm.compute_modifiers(_ad_cfg)
-# Pass tonic GABA multiplier to init.py via cfg (read by insert_tonic_gaba)
-cfg._ad_g_tonic = _mods['g_tonic']
-if not _ad_cfg.all_off():
-    print(f'[AD] s={_ad_cfg.s:.2f}  mods={_mods}')
-
 #------------------------------------------------------------------------------
 #
 # NETWORK PARAMETERS
@@ -131,14 +110,6 @@ for cell_name in cfg.allpops:
         'axonal':  axon_secs,
         # 'spiny' used internally; SYN_POS=0 is split into two rules
     }
-
-    # --- M2: scale PV Kv3.1 gbar in somatic + axonal sections ---
-    # Handle: gbar_Kv3_1 in biophys_HL23PV.hoc (somatic ~2.992, axonal ~2.989)
-    if cell_name == 'HL23PV' and _mods['gbar_Kv3_1'] != 1.0:
-        for sec_name in soma_secs + axon_secs:
-            sec_mechs = secs[sec_name].get('mechs', {})
-            if 'Kv3_1' in sec_mechs:
-                sec_mechs['Kv3_1']['gbar'] *= _mods['gbar_Kv3_1']
 
 # ----------------------------------------------------------------------------------------------------------------------- #
 # Rotate to z as vertical
@@ -574,17 +545,6 @@ for pre in cfg.allpops:
                                                         'gmax': circuit_params["syn_cond"].at[pre, post],
                                                     }
 
-# --- M3: scale excitatory (ProbAMPANMDA) conductances ---
-# gmax scales the AMPA component; weight_factor_NMDA provides AMPA/NMDA asymmetry.
-# At s=0: g_AMPA=1.0, g_NMDA=1.0 -> gmax unchanged, weight_factor_NMDA=1.0 (default).
-# At s>0: AMPA drops faster than NMDA -> weight_factor_NMDA = g_NMDA/g_AMPA > 1.
-if _mods['g_AMPA'] != 1.0 or _mods['g_NMDA'] != 1.0:
-    _nmda_ratio = _mods['g_NMDA'] / _mods['g_AMPA'] if _mods['g_AMPA'] > 0 else 1.0
-    for _key, _syn in netParams.synMechParams.items():
-        if _syn.get('mod') == 'ProbAMPANMDA':
-            _syn['gmax'] *= _mods['g_AMPA']
-            _syn['weight_factor_NMDA'] = _nmda_ratio
-
 #------------------------------------------------------------------------------
 # ConnParams
 #------------------------------------------------------------------------------
@@ -691,17 +651,3 @@ for pre in cfg.allpops:
                     netParams.connParams[pre + '->' + post]['sec'] = 'apical'
                 elif int(circuit_params['Syn_pos'].at[pre, post]) > 1:
                     netParams.connParams[pre + '->' + post]['sec'] = 'basal'
-
-# --- M1a/M1c/M4: scale connection weights by presynaptic population ---
-# M1a (w_SST_pre) × M1c (eff_SST) multiply together on all SST-outgoing weights.
-# M4 (eff_PYR) multiplies all PYR-outgoing weights.
-# At s=0 all multipliers are 1.0, so weight stays 1.0 (byte-identical to baseline).
-_sst_weight = _mods['w_SST_pre'] * _mods['eff_SST']
-_pyr_weight = _mods['eff_PYR']
-if _sst_weight != 1.0 or _pyr_weight != 1.0:
-    for _rule_name, _rule in netParams.connParams.items():
-        _pre_type = _rule.get('preConds', {}).get('cellType', '')
-        if _pre_type == 'HL23SST' and _sst_weight != 1.0:
-            _rule['weight'] = float(_rule.get('weight', 1.0)) * _sst_weight
-        elif _pre_type == 'HL23PYR' and _pyr_weight != 1.0:
-            _rule['weight'] = float(_rule.get('weight', 1.0)) * _pyr_weight
