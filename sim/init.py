@@ -250,6 +250,11 @@ def insert_tonic_gaba(sim_obj, cfg_obj, sing_cell_param):
                 g_soma = p['norm_tonic']
                 g_apic = p['apic_tonic']
 
+            # M1b: scale tonic GABA by AD modifier (1.0 at s=0, no change)
+            _g_tonic_scale = float(getattr(cfg_obj, '_ad_g_tonic', 1.0))
+            g_soma *= _g_tonic_scale
+            g_apic *= _g_tonic_scale
+
             for sname in [s for s in cell.secs if s.startswith('soma')]:
                 sec = cell.secs[sname]['hObj']
                 sec.insert('tonic')

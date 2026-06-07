@@ -70,6 +70,19 @@ cfg.USE_H01_DISTANCE_CONN = True
 cfg.H01_CSV_PATH = '../data/cell_positions_h01_rotated_full.csv'
 
 # ---------------------------------------------------------------------------
+# AD modifier layer — stage-dependent perturbations (Checkpoint 3)
+# ad_stage == CPS in [0,1]; each modifier is individually toggleable.
+# All default OFF: s=0 + all OFF reproduces the H01 baseline exactly.
+# ---------------------------------------------------------------------------
+cfg.ad_stage             = 0.0
+cfg.enable_M1a_sst_syn   = False   # SST->* synaptic weight (Poirel -42%)
+cfg.enable_M1b_tonic     = False   # tonic alpha5-GABA-A reduction
+cfg.enable_M1c_sst_loss  = False   # SST efficacy/abundance decline
+cfg.enable_M2_pv_kv31    = False   # PV Kv3.1 gbar reduction
+cfg.enable_M3_exc_scaffold = False # AMPA/NMDA reduction (VGLUT1/PSD95)
+cfg.enable_M4_pyr_loss   = False   # PYR efficacy/abundance decline
+
+# ---------------------------------------------------------------------------
 # LFP recording electrode (only used when cfg.rec_LFP = True)
 # ---------------------------------------------------------------------------
 # cfg.recordLFP = [[0.0, 0.0, 5.0]]
